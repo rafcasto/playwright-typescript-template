@@ -4,23 +4,46 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cucumber-js",
-    "test:headed": "HEADLESS=false cucumber-js",
-    "clean": "rm -rf reports dist",
-    "build": "tsc"
+    "bdd:generate": "bddgen",
+    "test": "npm run bdd:generate && playwright test",
+    "test:headed": "npm run bdd:generate && playwright test --headed",
+    "test:debug": "npm run bdd:generate && playwright test --debug",
+    "test:ui": "npm run bdd:generate && playwright test --ui",
+    "test:smoke": "npm run bdd:generate && playwright test --grep @smoke",
+    "test:negative": "npm run bdd:generate && playwright test --grep @negative",
+    "test:chrome": "npm run bdd:generate && playwright test --project=chromium",
+    "test:firefox": "npm run bdd:generate && playwright test --project=firefox",
+    "test:safari": "npm run bdd:generate && playwright test --project=webkit",
+    "ci": "bddgen && playwright test --reporter=json > test-results/results.json",
+    "ci:full": "bddgen && playwright test --reporter=html,json,junit",
+    "ci:json-file": "bddgen && playwright test --reporter=json --output=test-results/",
+    "ci:cucumber-json": "bddgen && playwright test --reporter=playwright-bdd/reporter/cucumber",
+    "ci:both-json": "bddgen && playwright test --reporter=json:test-results/playwright-results.json,playwright-bdd/reporter/cucumber:test-results/cucumber-results.json",
+    "install:browsers": "playwright install --with-deps",
+    "report": "playwright show-report",    
+    "clean": "rm -rf test-results playwright-report .features-gen",
+    "build": "tsc",
+    "dev": "npm run clean && npm run test:headed"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "playwright",
+    "bdd",
+    "cucumber", 
+    "gherkin",
+    "typescript",
+    "testing"
+  ],
+  "author": "Rafael CASTILLO",
   "license": "ISC",
   "dependencies": {
     "@playwright/test": "^1.53.2",
-    "@cucumber/cucumber": "^11.3.0",
-    "typescript": "^5.8.3",
+    "dotenv": "^17.0.1",
     "ts-node": "^10.9.2",
-    "dotenv": "^17.0.1"
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "@types/node": "^24.0.10"
+    "@types/node": "^24.0.10",
+    "playwright-bdd": "^8.3.1",
+    "typescript": "^5.8.3"
   }
 }

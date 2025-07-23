@@ -14,7 +14,7 @@ test-results/
 playwright-report/
 *.html
 
-
+.features-gen/
 # Screenshots and videos
 screenshots/
 videos/

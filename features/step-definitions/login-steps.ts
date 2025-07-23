@@ -1,36 +1,39 @@
-import { Given, When, Then } from '@cucumber/cucumber';
+import { createBdd } from 'playwright-bdd';
 import { expect } from '@playwright/test';
-import { CustomWorld } from '../../src/support/world';
+import { test } from '../../src/support/fixtures';
 import { DTOMapper } from '../../src/utils/dto-mapper';
 import { LoginDTO } from '../../src/types/dto';
 import { config } from '../../src/config/environment';
 
-Given('I am on the login page', async function (this: CustomWorld) {
-  await this.pages.loginPage.navigateToLogin();
+// Create BDD functions with custom fixtures
+const { Given, When, Then } = createBdd(test);
+
+Given('I am on the login page', async ({ loginPage }) => {
+  await loginPage.navigateToLogin();
 });
 
-When('I login with the following credentials:', async function (this: CustomWorld, dataTable) {
+When('I login with the following credentials:', async ({ loginPage }, dataTable) => {
   const loginData: LoginDTO[] = DTOMapper.mapToLoginDTO(dataTable);
-  await this.pages.loginPage.login(loginData[0]);
+  await loginPage.login(loginData[0]);
 });
 
-When('I login with default credentials', async function (this: CustomWorld) {
+When('I login with default credentials', async ({ loginPage }) => {
   const defaultLogin: LoginDTO = {
     username: config.username,
     password: config.password
   };
-  await this.pages.loginPage.login(defaultLogin);
+  await loginPage.login(defaultLogin);
 });
 
-Then('I should be logged in successfully', async function (this: CustomWorld) {
-  const isLoggedIn = await this.pages.loginPage.isLoginSuccessful();
+Then('I should be logged in successfully', async ({ loginPage }) => {
+  const isLoggedIn = await loginPage.isLoginSuccessful();
   expect(isLoggedIn).toBe(true);
   
-  const currentUrl = await this.pages.loginPage.getCurrentUrl();
+  const currentUrl = await loginPage.getCurrentUrl();
   expect(currentUrl).toContain('/inventory.html');
 });
 
-Then('I should see an error message {string}', async function (this: CustomWorld, expectedMessage: string) {
-  const actualMessage = await this.pages.loginPage.getErrorMessage();
+Then('I should see an error message {string}', async ({ loginPage }, expectedMessage: string) => {
+  const actualMessage = await loginPage.getErrorMessage();
   expect(actualMessage).toContain(expectedMessage);
 });
